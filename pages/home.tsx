@@ -1,6 +1,6 @@
 import React from 'react';
 import Typography from "@mui/material/Typography";
-import AppLayout from "../conponents/containers/AppLayout";
+import AppLayout from "conponents/containers/AppLayout";
 import Head from "next/head";
 
 const HomePage = () => {
