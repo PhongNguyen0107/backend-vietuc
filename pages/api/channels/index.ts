@@ -3,7 +3,7 @@ import {firestoreGetListOfChannels} from "services/firestore/channels.service";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-  const {method} = req;
+  const {method, body} = req;
 
   switch (method) {
     case "GET":
@@ -16,6 +16,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           total: channels.length
         }
       })
+
+    case "POST":
+      return res.status(200).end(`Updating...`)
 
     default:
       return res.status(405).end(`Method ${method} Not allowed`)

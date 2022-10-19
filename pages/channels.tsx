@@ -1,13 +1,22 @@
 import * as React from 'react';
+import {useEffect, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import AppLayout from "../conponents/containers/AppLayout";
 import Head from "next/head";
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import DeleteIcon from "@mui/icons-material/Delete"
+import {
+  DataGrid,
+  GridActionsCellItem,
+  GridCellEditStopReasons, GridRowId,
+  GridRowModel,
+  GridRowParams,
+  GridToolbar
+} from '@mui/x-data-grid';
 import Box from "@mui/material/Box";
-import {useEffect, useState} from "react";
 import moment from "moment";
 import {DATE_FORMAT} from "../src/config/app.constant";
-import {getListOfChannel} from "services/app/channels.app";
+import {deleteChannelById, getListOfChannel, updateChannelById} from "services/app/channels.app";
+import {ChannelDataModel} from "../src/models/ChannelsDTO";
 
 export default function ChannelsPage() {
 
@@ -20,7 +29,7 @@ export default function ChannelsPage() {
               href="https://www.creativefabrica.com/wp-content/uploads/2019/04/Chat-icon-by-ahlangraphic-39.jpg"/>
       </Head>
       <AppLayout>
-        <Typography variant={"h2"} >Channel Management</Typography>
+        <Typography variant={"h2"}>Channel Management</Typography>
 
         <Box sx={{pt: 2}}>
           <BasicExampleDataGrid/>
@@ -40,6 +49,13 @@ const BasicExampleDataGrid = ()=>  {
       setDataTable(res.data.data)
     })
   }
+
+  const onDeleteChannel = React.useCallback((record: any) => {
+    deleteChannelById(`${record?.id}`).then(res => {
+      if(res.status !== 200) return;
+      loadDataList()
+    })
+  }, [])
 
   useEffect(() => {
     loadDataList()
@@ -67,8 +83,39 @@ const BasicExampleDataGrid = ()=>  {
         return moment.unix(record?.value?._seconds).format(DATE_FORMAT.FULL);
       }
     },
+    // refs: column definition: https://mui.com/x/react-data-grid/column-definition/#column-types
+    {
+      field: 'actions',
+      "headerName": "Actions",
+      type: 'actions',
+      width: 200,
+      getActions: (param: GridRowParams) => [
+        //@ts-ignore
+        <GridActionsCellItem key={"delete"} icon={<DeleteIcon/>} onClick={() => onDeleteChannel(param)} label="Delete" />,
+      ]
+    }
   ]
 
+  const onUpdateRow = React.useCallback(
+    async (newRow: GridRowModel) =>
+      new Promise<GridRowModel>((resolve, reject) => {
+
+        console.log('log::76 Anonymous', newRow)
+        let payloadUpdate: ChannelDataModel = {
+          id: newRow.id,
+          ...newRow
+        }
+        const res: any = updateChannelById(payloadUpdate);
+        console.log('log::83 ress', res)
+        return res.status === 200 ? resolve(newRow) : reject(null)
+      }),
+    [],
+  );
+
+  const onUpdateRowError = React.useCallback((err: any) => console.log('log::err err', err), [])
+  // editing docs:  https://mui.com/x/react-data-grid/editing/
+
+  // example: https://mui.com/x/react-data-grid/editing/#AskConfirmationBeforeSave.tsx
   return (
     <div style={{ height: 400, width: '100%' }}>
       <DataGrid
@@ -88,6 +135,15 @@ const BasicExampleDataGrid = ()=>  {
             quickFilterProps: { debounceMs: 500 },
           }
         }}
+        experimentalFeatures={{newEditingApi: true}}
+        onCellEditStop={(param, event) => {
+          if(param.reason === GridCellEditStopReasons.cellFocusOut){
+            event.defaultMuiPrevented = true;
+          }
+        }}
+        getRowId={(row) => row?.id}
+        processRowUpdate={onUpdateRow}
+        onProcessRowUpdateError={onUpdateRowError}
       />
     </div>
   );
