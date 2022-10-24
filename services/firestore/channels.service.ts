@@ -1,6 +1,17 @@
-import {firestoreAdmin} from "../../src/config/firebase";
+import {firestoreAdmin, FirebaseAdmin} from "../../src/config/firebase";
 import {DB_NAME} from "../../src/config/firebase.constant";
-import {ChannelDataModel} from "../../src/models/ChannelsDTO";
+import {ChannelDataModel, ChannelPayloadModel} from "../../src/models/ChannelsDTO";
+const FieldValue = FirebaseAdmin.firestore.FieldValue
+
+export const firestorePostCreateAChannel = async (channelPayload: ChannelPayloadModel) => {
+  const customPayload = {
+    ...channelPayload,
+    created_at: FieldValue.serverTimestamp(),
+    description: channelPayload.name
+  }
+
+  return firestoreAdmin.collection(DB_NAME.CHANNELS).add(customPayload);
+}
 
 export const firestoreGetListOfChannels = async () => {
   let channels: any[] = [];

@@ -7,7 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete"
 import {
   DataGrid,
   GridActionsCellItem,
-  GridCellEditStopReasons, GridRowId,
+  GridCellEditStopReasons,
   GridRowModel,
   GridRowParams,
   GridToolbar
@@ -17,6 +17,7 @@ import moment from "moment";
 import {DATE_FORMAT} from "../src/config/app.constant";
 import {deleteChannelById, getListOfChannel, updateChannelById} from "services/app/channels.app";
 import {ChannelDataModel} from "../src/models/ChannelsDTO";
+import ChannelFormBuilderDialog from "conponents/containers/channels/ChannelFormBuilderDialog";
 
 export default function ChannelsPage() {
 
@@ -32,7 +33,7 @@ export default function ChannelsPage() {
         <Typography variant={"h2"}>Channel Management</Typography>
 
         <Box sx={{pt: 2}}>
-          <BasicExampleDataGrid/>
+          <ChannelDataGridTableContainer/>
         </Box>
       </AppLayout>
     </React.Fragment>
@@ -40,7 +41,7 @@ export default function ChannelsPage() {
 }
 
 
-const BasicExampleDataGrid = ()=>  {
+const ChannelDataGridTableContainer = () => {
   const [dataTable, setDataTable] = useState([])
 
   const loadDataList = () => {
@@ -52,7 +53,7 @@ const BasicExampleDataGrid = ()=>  {
 
   const onDeleteChannel = React.useCallback((record: any) => {
     deleteChannelById(`${record?.id}`).then(res => {
-      if(res.status !== 200) return;
+      if (res.status !== 200) return;
       loadDataList()
     })
   }, [])
@@ -91,7 +92,8 @@ const BasicExampleDataGrid = ()=>  {
       width: 200,
       getActions: (param: GridRowParams) => [
         //@ts-ignore
-        <GridActionsCellItem key={"delete"} icon={<DeleteIcon/>} onClick={() => onDeleteChannel(param)} label="Delete" />,
+        <GridActionsCellItem key={"delete"} icon={<DeleteIcon/>} onClick={() => onDeleteChannel(param)}
+                             label="Delete"/>,
       ]
     }
   ]
@@ -117,34 +119,38 @@ const BasicExampleDataGrid = ()=>  {
 
   // example: https://mui.com/x/react-data-grid/editing/#AskConfirmationBeforeSave.tsx
   return (
-    <div style={{ height: 400, width: '100%' }}>
-      <DataGrid
-        initialState={{
-          "columns": {
-            "columnVisibilityModel": {
-              "id": false,
+    <Box sx={{width: '100%'}}>
+      <ChannelFormBuilderDialog  onRefresh={loadDataList} />
+
+      <Box sx={{pt: 2, height: "calc(100vh - 320px)"}}>
+        <DataGrid
+          initialState={{
+            "columns": {
+              "columnVisibilityModel": {
+                "id": false,
+              }
             }
-          }
-        }}
-        columns={columns} rows={dataTable}
-        components={{ Toolbar: GridToolbar }}
-        componentsProps={{
-          toolbar: {
-            //refs: https://mui.com/x/react-data-grid/filtering/#quick-filter
-            showQuickFilter: true,
-            quickFilterProps: { debounceMs: 500 },
-          }
-        }}
-        experimentalFeatures={{newEditingApi: true}}
-        onCellEditStop={(param, event) => {
-          if(param.reason === GridCellEditStopReasons.cellFocusOut){
-            event.defaultMuiPrevented = true;
-          }
-        }}
-        getRowId={(row) => row?.id}
-        processRowUpdate={onUpdateRow}
-        onProcessRowUpdateError={onUpdateRowError}
-      />
-    </div>
+          }}
+          columns={columns} rows={dataTable}
+          components={{Toolbar: GridToolbar}}
+          componentsProps={{
+            toolbar: {
+              //refs: https://mui.com/x/react-data-grid/filtering/#quick-filter
+              showQuickFilter: true,
+              quickFilterProps: {debounceMs: 500},
+            }
+          }}
+          experimentalFeatures={{newEditingApi: true}}
+          onCellEditStop={(param, event) => {
+            if (param.reason === GridCellEditStopReasons.cellFocusOut) {
+              event.defaultMuiPrevented = true;
+            }
+          }}
+          getRowId={(row) => row?.id}
+          processRowUpdate={onUpdateRow}
+          onProcessRowUpdateError={onUpdateRowError}
+        />
+      </Box>
+    </Box>
   );
 }

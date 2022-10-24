@@ -1,5 +1,5 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {firestoreGetListOfChannels} from "services/firestore/channels.service";
+import {firestoreGetListOfChannels, firestorePostCreateAChannel} from "services/firestore/channels.service";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
@@ -18,7 +18,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
 
     case "POST":
-      return res.status(200).end(`Updating...`)
+      let postChannelResp = await firestorePostCreateAChannel(body);
+
+      return res.status(200).json({
+        data: postChannelResp
+      })
 
     default:
       return res.status(405).end(`Method ${method} Not allowed`)
