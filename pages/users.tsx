@@ -18,6 +18,9 @@ import {DATE_FORMAT} from "../src/config/app.constant";
 import {deleteUserById, getListOfUser, updateUserById} from "services/app/users.app";
 import {UserDataModel} from "../src/models/UsersDTO";
 import UserFormBuilderDialog from "conponents/containers/users/UserFormBuilderDialog";
+import {Avatar} from "@mui/material";
+import RoleSelectionBox from "conponents/containers/roles/RoleSelectionBox";
+import {getListOfRole} from "services/app/roles.app";
 
 export default function UsersPage() {
 
@@ -43,11 +46,21 @@ export default function UsersPage() {
 
 const UsersDataGridTableContainer = () => {
   const [dataTable, setDataTable] = useState([])
+  const [roleOpts, setRoleOpts] = useState([])
 
   const loadDataList = () => {
     getListOfUser().then(res => {
       console.table(res.data.data)
       setDataTable(res.data.data)
+    })
+
+    loadRoleOpts()
+  }
+
+  const loadRoleOpts = () => {
+    getListOfRole().then(res => {
+      console.table(res.data.data)
+      setRoleOpts(res.data.data)
     })
   }
 
@@ -57,6 +70,17 @@ const UsersDataGridTableContainer = () => {
       loadDataList()
     })
   }, [])
+
+  const updateUserRole = (userData: any, roleUpdate: any) => {
+    let payloadUpdate: UserDataModel = {
+      id: userData.id,
+      ...userData,
+      role: roleUpdate
+    }
+    updateUserById(payloadUpdate).then(resp => {
+      if(resp.status === 200) loadDataList();
+    })
+  }
 
   useEffect(() => {
     loadDataList()
@@ -68,13 +92,68 @@ const UsersDataGridTableContainer = () => {
       "hide": true
     },
     {
-      "field": "name",
+      "field": "uid",
+      "hide": true
+    },
+    {
+      "field": "displayName",
       "headerName": "User name",
       "sortable": true,
       "filterable": true,
       "disableExport": false,
-      "width": 220,
+      "width": 240,
       "editable": true
+    },
+    {
+      "field": "photoURL",
+      "headerName": "Avatar",
+      "sortable": true,
+      "filterable": true,
+      "disableExport": false,
+      "width": 80,
+      "editable": true,
+      "renderCell": (param: any) => {
+        return (<Avatar src={param.value} />)
+      }
+    },
+    {
+      "field": "role",
+      "headerName": "Role",
+      "sortable": true,
+      "filterable": true,
+      "disableExport": false,
+      "width": 380,
+      "editable": false,
+      "renderCell": (param: any) => {
+        return <RoleSelectionBox role={param.value} user={param.row} roleOpts={roleOpts} onUpdate={updateUserRole} />
+      }
+    },
+    {
+      "field": "email",
+      "headerName": "Email",
+      "sortable": true,
+      "filterable": true,
+      "disableExport": false,
+      "width": 320
+    },
+    {
+      "field": "active",
+      "headerName": "Active",
+      "type": "boolean",
+      "sortable": true,
+      "filterable": true,
+      "disableExport": false,
+      "valueOptions": [true, false],
+      "editable": true,
+      "width": 80
+    },
+    {
+      "field": "phoneNumber",
+      "headerName": "Phone",
+      "sortable": true,
+      "filterable": true,
+      "disableExport": false,
+      "width": 100
     },
     {
       "field": "created_at",
@@ -124,10 +203,13 @@ const UsersDataGridTableContainer = () => {
             "columns": {
               "columnVisibilityModel": {
                 "id": false,
+                "uid": false,
               }
             }
           }}
-          columns={columns} rows={dataTable}
+          /*@ts-ignore*/
+          columns={columns}
+          rows={dataTable}
           components={{Toolbar: GridToolbar}}
           componentsProps={{
             toolbar: {
