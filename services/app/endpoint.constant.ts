@@ -11,3 +11,10 @@ export const ROLE_ENDPOINT = {
   CREATE: "/roles",
   DELETE: "/roles/"
 }
+
+export const USER_ENDPOINT = {
+  GET_LIST: "/users",
+  UPDATE: "/users/",
+  CREATE: "/users",
+  DELETE: "/users/"
+}

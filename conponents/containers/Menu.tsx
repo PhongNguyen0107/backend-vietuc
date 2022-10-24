@@ -13,7 +13,7 @@ import MuiDrawer from '@mui/material/Drawer';
 import {styled, useTheme, Theme, CSSObject} from "@mui/material/styles";
 import {MenuOpts, SubMenuOpts} from "../../src/route-options";
 import Link from "next/link";
-import {getIconByName} from "../../conponents/elements/AppIcon";
+import {getIconByName} from "conponents/elements/AppIcon";
 
 type MenuPropType = {
   open: boolean;

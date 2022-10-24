@@ -2,6 +2,7 @@ export const ROUTE_NAME = {
   DASHBOARD: "/home",
   CHANNELS: "/channels",
   ROLES: "/roles",
+  USERS: "/users",
   PROFILE: "/profile"
 }
 
@@ -23,6 +24,12 @@ export const MenuOpts = [
     path: ROUTE_NAME.ROLES,
     title: "Roles",
     icon: "role"
+  },
+  {
+    id: 4,
+    path: ROUTE_NAME.USERS,
+    title: "Users",
+    icon: "user"
   }
 ]
 
