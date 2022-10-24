@@ -1,4 +1,5 @@
 export const DB_NAME = {
   CHANNELS: "channels",
-  MESSAGES: "messages"
+  MESSAGES: "messages",
+  ROLES: "roles"
 }
