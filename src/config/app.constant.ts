@@ -4,5 +4,5 @@ export const DATE_FORMAT = {
 }
 
 export const APP_CONFIG = {
-  HOST: ""
+  HOST: "https://slack-management.vercel.app"
 }

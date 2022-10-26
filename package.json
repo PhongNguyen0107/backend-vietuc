@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 8080",
     "build": "next build && next export",
+    "deploy": "yarn build && firebase deploy",
     "start": "next start",
     "lint": "next lint"
   },
