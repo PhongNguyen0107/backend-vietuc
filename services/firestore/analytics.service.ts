@@ -8,33 +8,58 @@ export const firestoreGetDataAnalytics = async () => {
   let users = await firestoreGetListOfUsers();
   let channels = await firestoreGetListOfChannels();
   let roles = await firestoreGetListOfRoles();
-  let messages = await firestoreGetMessageMetric(channels);
+  let messageMetric = await firestoreGetMessageMetric(channels);
 
-  let resp: any = {
+  let roleGroupBy: any[] = [];
+  roles.forEach(r => {
+    let listOfUserByRoleId = users.filter(u => u.role.id === r.id);
+    roleGroupBy.push({
+      name: r.name,
+      value: listOfUserByRoleId.length,
+      roleData: r,
+      users: listOfUserByRoleId
+    })
+  })
+
+
+  return {
     users: users.length || 0,
     channels: channels.length || 0,
     roles: roles.length || 0,
-    totalMessage: messages
+    totalMessage: messageMetric.total,
+    meta: {
+      roleGroupByUser: roleGroupBy,
+      messageGroupByChannel: messageMetric.channels
+    }
   }
 
-  return resp;
 }
 
 
 const firestoreGetMessageMetric = async (channels: any[]) => {
+  let channelUpdate: any[] = channels.map(c => {
+    return {
+      ...c,
+      total_message: 0
+    }
+  })
   let total = 0;
-  for await (let c of channels) {
+  for await (let c of channelUpdate) {
     const subMessageCollection = await firestoreAdmin.collection(DB_NAME.CHANNELS)
       .doc(c.id)
       .collection(DB_NAME.MESSAGES)
       .get();
 
     total = total + subMessageCollection.size;
+    c.total_message = subMessageCollection.size;
 
     // subMessageCollection.forEach(m => {
     //
     // })
   }
 
-  return total
+  return {
+    channels: channelUpdate,
+    total
+  }
 }

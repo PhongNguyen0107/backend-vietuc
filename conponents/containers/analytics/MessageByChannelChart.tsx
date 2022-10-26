@@ -11,14 +11,14 @@ import {useChart} from '../../elements/chart';
 // ----------------------------------------------------------------------
 
 //@ts-ignore
-export default function RoleByUserChart(props) {
+export default function MessageByChannelChart(props) {
   const {title, subheader, chartData, ...other} = props;
 
   // @ts-ignore
   const chartLabels = chartData.map((i) => i.name);
 
   // @ts-ignore
-  const chartSeries = chartData.map((i) => i.value);
+  const chartSeries = chartData.map((i) => i.total_message);
 
   const chartOptions = useChart({
     tooltip: {

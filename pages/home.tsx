@@ -7,6 +7,8 @@ import SummaryCard from "conponents/elements/SummaryCard";
 import DataSaverOffIcon from '@mui/icons-material/DataSaverOff';
 import Typography from "@mui/material/Typography";
 import {getListDataAnalyticsByMetric} from "services/app/analytics.app";
+import RoleByUserChart from "conponents/containers/analytics/RoleByUserChart";
+import MessageByChannelChart from "conponents/containers/analytics/MessageByChannelChart";
 
 const HomePage = () => {
   const [metrics, setMetrics] = useState<any>({});
@@ -47,6 +49,27 @@ const HomePage = () => {
             <Grid item xs={12} sm={6} md={3}>
               <SummaryCard title="Roles" total={metrics.roles} color="warning" icon={<DataSaverOffIcon/>}/>
             </Grid>
+
+
+             <Grid item xs={12} md={6}>
+              <RoleByUserChart
+                title="Roles"
+                subheader="Role by each user"
+                chartData={metrics?.meta?.roleGroupByUser || []}
+              />
+            </Grid>
+
+
+             <Grid item xs={12} md={6}>
+              <MessageByChannelChart
+                title="Messages"
+                subheader="Message by each channel"
+                chartData={metrics?.meta?.messageGroupByChannel || []}
+              />
+            </Grid>
+
+
+
           </Grid>
         </Box>
       </AppLayout>
