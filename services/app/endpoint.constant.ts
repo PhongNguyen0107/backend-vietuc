@@ -18,3 +18,7 @@ export const USER_ENDPOINT = {
   CREATE: "/users",
   DELETE: "/users/"
 }
+
+export const ANALYTICS_ENDPOINT = {
+  GET_LIST_OF_METRICS_DATA: "/analytics"
+}
